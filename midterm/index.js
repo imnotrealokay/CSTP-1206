@@ -47,17 +47,48 @@ app.get("/employees", (req, res) => {
 //2
 app.get("/employees/id/:department",(req, res) => {
     res.send("Working too!!")
+    res.status(201).json({
+        message: "Yo!!",
+        //data: employeeList.department
+    })
 })
 
 //3
 app.get("/employees/:employeeID",(req, res) => {
-    res.send(200)("Done!")
+    res.send("Done!")
 })
 
 //4
-// app.post("/employees", urlencoded, function(req, res){
-//     res.render("/employees", {q: req, res})
-// })
+app.post("/employees", function(req, res){
+    const input = res.body;
+
+    employeeList.push(input);
+
+    return res.status(202).json({
+        message: "Kidaan!!",
+        data: employeeList,
+    })
+})
+
+//5
+// app.put("/employees/:employeeID",(req, res) => {
+//     const id = req.params.id;
+
+//     const findID = employeeList.find((employee) => employee.id == id ? true : false);
+
+//     if (findID) {
+//         return res.status(200).json({
+//             message: "Found it!",
+//             data: employeeList
+//         })
+//     }else{
+//         return status(404).json({
+//             message: "Not Found"
+//         })
+//     }
+
+
+// }
 
 
 app.listen(port, () => {
