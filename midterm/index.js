@@ -1,7 +1,7 @@
 const { urlencoded } = require("express");
 const express = require("express");
 const app = express();
-const port = 5000;
+const PORT = 5000;
 //const cors = require("cors");
 
 let employeeList = [
@@ -35,62 +35,138 @@ app.get("/",(req, res) =>{
 ///1
 app.get("/employees", (req, res) => {
     return res.status(200).json({
-        message: "succesfull",
-        data: employeeList
+      message:"Succesfully fetched the details",
+      data: employeeList
     })
-})
-// app.listen(port, () => {
-//     console.log('Listening at http://localhost:' + port);
-// })
-
+  })
 
 //2
-app.get("/employees/id/:department",(req, res) => {
-    res.send("Working too!!")
-    res.status(201).json({
-        message: "Yo!!",
-        //data: employeeList.department
-    })
-})
+  
+  app.get("/employees/:department", (req, res) => {
+    const departmentID = req.params.department;
+    const department = employeeList.filter((employee) => employee.department === departmentID);
+  
+      if(department){
+      return res.status(200).json({
+        message: "Succesfully fetched the employeeList",
+        data: department
+      })
+    }else{
+      return res.status(404).json({
+        message: "Department Doesn't Exist"
+      })
+    }
+  })
 
 //3
-app.get("/employees/:employeeID",(req, res) => {
-    res.send("Done!")
-})
+  
+  app.get("/employees/id/:employeeID", (req, res) => {
+    const id = +req.params.employeeID;
+    const findPerson = employeeList.filter((employee) => employee.employeeID === id);
+  
+      if(findPerson){
+      return res.status(200).json({
+        message: "Succesfully fetched the article",
+        data: findPerson
+      })
+    }else{
+      return res.status(404).json({
+        message: "Department Doesn't Exist"
+      })
+    }
+  })
 
 //4
-app.post("/employees", function(req, res){
-    const input = res.body;
+  
+  app.post("/employees", (req,res) => {
+    const data =req.body;
+    
+    if(!data.name || !data.email || !data.employeeID || !data.department || !data.Salary){
+      return res.status(500).json({
+        message: "One of the parameters is missing"
+      })
+    }
+  
+    data.id = employeeList.length + 1;
+  
+    employeeList.push(data);
+  
+    return res.status(201).json({
+      message:"Succesfully fetched the details",
+      data: employeeList
+    })
+  
+  })
+  //5
+  
+  app.put("/employees/id/:employeeID", (req, res) => {
+      const id = +req.params.employeeID;
+      const postToUpdate = req.body;
+      if(!postToUpdate.name || !postToUpdate.email || !postToUpdate.employeeID || !postToUpdate.department || !postToUpdate.Salary){
+      return res.status(500).json({
+        message: "One of the parameters is missing"
+      })
+    }
+      employeeList = employeeList.map((post) => {
+          if (post.employeeID == id) {
+              post = postToUpdate;
+          }
+  
+          return post;
+      })
+  
+  
+  
+      return res.status(200).json({
+          message: "Succesfully updated the article",
+          data: employeeList
+      })
+  
+  })
 
-    employeeList.push(input);
+//6
+  
+  app.delete("/employees/id/:employeeID", (req,res) => {
+  
+      const id = +req.params.employeeID;    
+      const index = employeeList.findIndex((employee) => {
+          if (employee.employeeID == id) {
+              return true;
+          }
+      })
+  
+      if (index !== -1) {
+          employeeList.splice(index, 1);
+  
+          return res.status(200).json({
+              message: "Succesfully deleted the employee",
+              data: employeeList
+          })
+      
+      } else {
+          return res.status(404).json({
+              message: "Element you are trying to delete doesn't exist"
+          })
+      }
+  
+  })
 
-    return res.status(202).json({
-        message: "Kidaan!!",
-        data: employeeList,
+//7
+  
+  app.get("/employees/salaries/highest", (req,res) => {
+  
+    employeeList.sort((a,b) => {
+      return b.Salary - a.Salary;
+    })
+   
+  
+      return res.status(201).json({
+      message:"Sorted by salary",
+      data: employeeList
     })
 })
-
-//5
-// app.put("/employees/:employeeID",(req, res) => {
-//     const id = req.params.id;
-
-//     const findID = employeeList.find((employee) => employee.id == id ? true : false);
-
-//     if (findID) {
-//         return res.status(200).json({
-//             message: "Found it!",
-//             data: employeeList
-//         })
-//     }else{
-//         return status(404).json({
-//             message: "Not Found"
-//         })
-//     }
-
-
-// }
-
-
-app.listen(port, () => {
-    console.log('Listening at http://localhost:' + port + '/employees/id/:employeeID');
-})
+  
+  
+  app.listen(PORT, ()=>{
+    console.log(`Server running at port ${PORT}`);
+  })
